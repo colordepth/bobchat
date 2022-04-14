@@ -1,0 +1,11 @@
+{
+  "name": "server",
+  "version": "0.1.0",
+  "description": "Bobchat backend",
+  "main": "index.js",
+  "author": "Deep Sharma",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.3"
+  }
+}
