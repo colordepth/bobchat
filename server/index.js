@@ -156,9 +156,7 @@ function supplyConversationsList(socket) {
 
   userMessages.forEach(message => {
     const partnerID = message.to === user.id ? message.from : message.to;
-    const existingConversation = conversations.get(message.partnerID);
-
-    console.log(message);
+    const existingConversation = conversations.get(partnerID);
 
     const reports = messageReport.filter(report =>
         report.messageID === message.id
@@ -181,7 +179,6 @@ function supplyConversationsList(socket) {
       else {
         newConversation.partner = getUserInfo(partnerID);
       }
-
       newConversation.messages = [ {...message, reports} ];
       conversations.set(partnerID, newConversation);
     }
@@ -189,7 +186,6 @@ function supplyConversationsList(socket) {
   });
 
   socket.emit("conversation list", [...conversations.values()]);
-  console.log([...conversations.values()]);
 }
 
 io.on("connection", (socket) => {
@@ -216,7 +212,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("chat message", data => {
-    console.log(data);
     const message = {
       id: v4(),
       from: socket.userID,

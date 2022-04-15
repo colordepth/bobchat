@@ -1,30 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import ConversationItem from "./ConversationItem";
-import socket from "../services/socket";
+import Modal from "./Modal";
 import "../stylesheets/ConversationList.css";
 
-const ConversationList = ({ conversations, setConversations, setActiveConversationPartnerID }) => {
+const ConversationList = ({ conversations, setActiveConversationPartnerID }) => {
 
-  useEffect(() => {
-    socket.on("conversation list", data => setConversations(data));
-
-    socket.on("chat message", message => {
-      const newConversations = conversations.map(conversation => {
-        const partnerID = conversation.partner.id;
-        if ( partnerID === message.from || partnerID === message.to ) {
-          const messages = conversation.messages.concat(message);
-          return {...conversation, messages};
-        }
-        return conversation;
-      })
-      setConversations(newConversations);
-    })
-
-    return () => {
-      socket.off("conversation list");
-      socket.off("chat message");
-    }
-  })
+  const [modalIsOpen, setModalIsOpen] = useState(false);
 
   if (!conversations) {
     return (
@@ -57,6 +38,13 @@ const ConversationList = ({ conversations, setConversations, setActiveConversati
             </li>
           )
         }
+        <Modal isOpen={modalIsOpen}>
+          <div>
+            <input type="text" value="partnerID" />
+            <button onClick={() => setModalIsOpen(false)}>Connect</button>
+          </div>
+        </Modal>
+        <button onClick={() => setModalIsOpen(true)}>Message New User</button>
     </div>
   );
 }

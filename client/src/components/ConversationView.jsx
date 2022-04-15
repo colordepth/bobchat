@@ -38,6 +38,7 @@ const ChatInput = ({ conversation }) => {
       <input
         type="text"
         value={inputText}
+        placeholder="Type your message here..."
         onChange={event => setInputText(event.target.value)}
       />
       <input type="submit" value="Send"/>

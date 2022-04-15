@@ -18,6 +18,7 @@
   background-color: #026855;
 }
 
-.ChatInputContainer > input {
+.ChatInputContainer > input[type=text] {
   flex-grow: 1;
+  padding-left: 0.6rem;
 }
