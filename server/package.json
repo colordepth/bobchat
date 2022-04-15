@@ -3,9 +3,18 @@
   "version": "0.1.0",
   "description": "Bobchat backend",
   "main": "index.js",
-  "author": "Deep Sharma",
+  "author": "Deep Sharma <deepsharma.cs@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.17.3"
+    "express": "^4.17.3",
+    "socket.io": "^4.4.1",
+    "uuid": "^8.3.2"
+  },
+  "scripts": {
+    "start": "node .",
+    "dev": "nodemon ."
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
   }
 }
