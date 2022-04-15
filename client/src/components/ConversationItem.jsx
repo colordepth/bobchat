@@ -1,9 +1,13 @@
-import '../stylesheets/ConversationItem.css';
+import { useDispatch } from "react-redux";
+import "../stylesheets/ConversationItem.css";
+import { setActiveConversationID } from "../slices/conversationSlice";
 
-const ConversationItem = ({ conversation, setActiveConversationPartnerID }) => {
+const ConversationItem = ({ conversation }) => {
+  const dispatch = useDispatch();
+
   return (
     <div
-      onClick={() => setActiveConversationPartnerID(conversation.partner.id)}
+      onClick={() => { dispatch(setActiveConversationID(conversation.partner.id)) }}
       className="ConversationItem"
     >
       <span className="ConversationItemTitle">

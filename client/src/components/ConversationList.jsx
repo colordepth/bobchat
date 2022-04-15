@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import { selectAllConversations } from "../slices/conversationSlice";
 import ConversationItem from "./ConversationItem";
 import Modal from "./Modal";
 import "../stylesheets/ConversationList.css";
 
-const ConversationList = ({ conversations, setActiveConversationPartnerID }) => {
+const ConversationList = () => {
+  const conversations = useSelector(selectAllConversations);
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
@@ -33,7 +36,6 @@ const ConversationList = ({ conversations, setActiveConversationPartnerID }) => 
             >
               <ConversationItem
                 conversation={ conversation }
-                setActiveConversationPartnerID={ setActiveConversationPartnerID }
               />
             </li>
           )

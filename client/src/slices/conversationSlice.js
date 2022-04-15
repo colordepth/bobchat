@@ -22,16 +22,20 @@ const conversationSlice = createSlice({
     setActiveConversationID: (state, action) => {
       const partnerID = action.payload;
       state.activeConversationID = partnerID;
+    },
+    setConversations: (state, action) => {
+      const conversations = action.payload;
+      state.conversations = conversations;
     }
   }
 })
 
-export const { addMessageToConversations } = conversationSlice.actions;
+export const { addMessageToConversations, setActiveConversationID, setConversations } = conversationSlice.actions;
 
 export const selectAllConversations = state => state.conversation.conversations;
 export const selectActiveConversationID = state => state.conversation.activeConversationID;
 export const selectConversationByPartnerID = id =>
-  state => state.conversation.conversations.find(conversation =>
+  state => state.conversation.conversations && state.conversation.conversations.find(conversation =>
     conversation.partner.id === id
   );
 

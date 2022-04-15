@@ -1,6 +1,8 @@
 import "../stylesheets/ConversationView.css";
 import socket from "../services/socket";
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import { selectActiveConversationID, selectConversationByPartnerID } from "../slices/conversationSlice";
 
 const ConversationHeader = ({ conversation }) => {
   return (
@@ -46,8 +48,13 @@ const ChatInput = ({ conversation }) => {
   );
 }
 
-const ConversationView = ({ conversation }) => {
-  if (!conversation) {
+const ConversationView = () => {
+  const activeConversationID = useSelector(selectActiveConversationID);
+  const activeConversation = useSelector(selectConversationByPartnerID(activeConversationID));
+
+  console.log(activeConversation);
+  
+  if (!activeConversation) {
     return (
       <div className="ConversationView unready-state">
         Click on a conversation to view...
@@ -57,9 +64,9 @@ const ConversationView = ({ conversation }) => {
 
   return (
     <div className="ConversationView">
-      <ConversationHeader conversation={ conversation } />
-      <ConversationContent conversation={ conversation } />
-      <ChatInput conversation={ conversation } />
+      <ConversationHeader conversation={ activeConversation } />
+      <ConversationContent conversation={ activeConversation } />
+      <ChatInput conversation={ activeConversation } />
     </div>
   );
 }
