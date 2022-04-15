@@ -1,10 +1,10 @@
-import ConversationList from "./components/ConversationList";
-import socket from "./services/socket";
+import ConversationList from "../components/ConversationList";
+import socket from "../services/socket";
 import { useEffect, useState } from "react";
 
-import "./stylesheets/App.css";
-import ConversationView from "./components/ConversationView";
-import Login from "./components/Login";
+import "../stylesheets/App.css";
+import ConversationView from "../components/ConversationView";
+import Login from "../components/Login";
 
 const App = () => {
   const [ sessionID, setSessionID ] = useState(null);
@@ -44,11 +44,11 @@ const App = () => {
   return (
     <div className="App">
       {!sessionID && <Login setSessionID={setSessionID}/>}
-      <ConversationView conversation={activeConversation} />
       <ConversationList
         conversations={conversations}
         setActiveConversationPartnerID={setActiveConversationPartnerID}
       />
+      <ConversationView conversation={activeConversation} />
     </div>
   );
 }
