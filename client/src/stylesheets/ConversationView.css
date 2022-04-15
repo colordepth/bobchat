@@ -1,0 +1,23 @@
+.ConversationView {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0.4rem;
+}
+
+.ConversationContent {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.ChatInputContainer {
+  display: flex;
+  height: 50px;
+  padding: 10px;
+  align-items: stretch;
+  background-color: #026855;
+}
+
+.ChatInputContainer > input {
+  flex-grow: 1;
+}

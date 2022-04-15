@@ -1,0 +1,11 @@
+.ConversationList {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid black;
+  width: 400px;
+  gap: 1px;
+}
+
+.ConversationList > li {
+  list-style: none;
+}

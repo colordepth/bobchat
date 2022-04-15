@@ -10,5 +10,13 @@
   "workspaces": [
     "client",
     "server"
-  ]
+  ],
+  "scripts": {
+    "dev-server": "yarn --cwd server dev",
+    "dev-client": "BROWSER=none yarn --cwd client start",
+    "dev": "concurrently -k -p '{name}' -n 'server,client' -c 'bgBlue.bold,bgGreen.bold' 'yarn:dev-server' 'yarn:dev-client'"
+  },
+  "devDependencies": {
+    "concurrently": "^7.1.0"
+  }
 }

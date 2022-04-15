@@ -13,7 +13,8 @@ const sampleMessage1 = {
   from: "8126416373",
   to: "9412088616",
   content: "hello",
-  attachment: null
+  attachment: null,
+  creationTime: new Date()
 };
 
 const sampleMessage2 = {
@@ -21,7 +22,8 @@ const sampleMessage2 = {
   from: "8126416373",
   to: "2489cc65-f46e-4d1d-915c-6a741f31d183",
   content: "hello group",
-  attachment: null
+  attachment: null,
+  creationTime: new Date()
 };
 
 const messageReport = [
@@ -212,6 +214,20 @@ io.on("connection", (socket) => {
     user.lastSeen = new Date();
     broadcastOnlineStatus(socket);
   });
+
+  socket.on("chat message", data => {
+    console.log(data);
+    const message = {
+      id: v4(),
+      from: socket.userID,
+      to: data.to,
+      content: data.content,
+      attachment: data.attachment,
+      creationTime: new Date()
+    };
+    messages.push(message);
+    io.to(socket.userID).to(data.to).emit("chat message", message);
+  })
 })
 
 app.use(express.static(path.join(__dirname, "build")));

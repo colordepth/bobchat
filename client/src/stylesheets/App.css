@@ -1,0 +1,11 @@
+.unready-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: green;
+}
+
+.App {
+  display: flex;
+  height: 100%;
+}
