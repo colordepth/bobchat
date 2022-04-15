@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Modal from "./Modal";
 import { loginWithUserID, setSessionListenerCallback } from "../services/auth";
+import "../stylesheets/Login.css";
 
 const Login = ({ setSessionID }) => {
   const [userID, setUserID] = useState("");
@@ -12,17 +13,17 @@ const Login = ({ setSessionID }) => {
 
   return (
     <Modal isOpen={true}>
-      <div className="LoginCard">
+      <form className="LoginCard" onSubmit={(e) => {e.preventDefault(); loginWithUserID(userID)}}>
+        
         <input
           type="text"
           value={userID}
           placeholder="Phone number"
           onChange={event => setUserID(event.target.value)}
         />
-        <button onClick={() => loginWithUserID(userID)}>
-          Log in
-        </button>
-      </div>
+
+        <input type="button" value="Log in" />
+      </form>
     </Modal>
   );
 }

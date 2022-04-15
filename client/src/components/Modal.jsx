@@ -4,12 +4,7 @@ import '../stylesheets/Modal.css';
 const Modal = ({ children, isOpen }) => {
   const modalRef = useRef();
 
-  if (isOpen) {
-    modalRef && modalRef.current && modalRef.current.showModal();
-  }
-  else {
-    modalRef && modalRef.current && modalRef.current.close();
-  }
+  console.log(isOpen);
 
   function centerModal() {
     const width = modalRef.current.getBoundingClientRect().width;
@@ -20,10 +15,21 @@ const Modal = ({ children, isOpen }) => {
   }
 
   useEffect(() => {
+    if (!(modalRef && modalRef.current))
+      return;
+    
+    const modal = modalRef.current;
+
+    if (isOpen !== modal.open)
+      isOpen ? modal.showModal() : modal.close();
+
+  }, [ modalRef, isOpen ]);
+
+  useEffect(() => {
     centerModal();
     window.onresize = centerModal;
   },
-  [isOpen, children]);
+  [ isOpen, children ]);
 
   return (
     <dialog ref={modalRef} className="Modal">
