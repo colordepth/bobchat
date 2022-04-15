@@ -2,15 +2,21 @@ import { useEffect, useRef } from 'react';
 import '../stylesheets/Modal.css';
 
 const Modal = ({ children, isOpen }) => {
-
   const modalRef = useRef();
+
+  if (isOpen) {
+    modalRef && modalRef.current && modalRef.current.showModal();
+  }
+  else {
+    modalRef && modalRef.current && modalRef.current.close();
+  }
 
   function centerModal() {
     const width = modalRef.current.getBoundingClientRect().width;
     const height = modalRef.current.getBoundingClientRect().height;
 
     modalRef.current.style.top = `calc(50vh - ${height/2}px - 50px)`;
-    modalRef.current.style.left = `calc(50vw - ${width/2}px - 200px)`;
+    modalRef.current.style.left = `calc(50vw - ${width/2}px + 200px)`;
   }
 
   useEffect(() => {
@@ -20,7 +26,7 @@ const Modal = ({ children, isOpen }) => {
   [isOpen, children]);
 
   return (
-    <dialog ref={modalRef} className="Modal" open={isOpen}>
+    <dialog ref={modalRef} className="Modal">
       { children }
     </dialog>
   );

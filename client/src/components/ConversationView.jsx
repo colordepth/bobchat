@@ -1,8 +1,7 @@
-import "../stylesheets/ConversationView.css";
-import socket from "../services/socket";
-import { useState } from "react";
 import { useSelector } from "react-redux";
 import { selectActiveConversationID, selectConversationByPartnerID } from "../slices/conversationSlice";
+import ChatInput from "./ChatInput";
+import "../stylesheets/ConversationView.css";
 
 const ConversationHeader = ({ conversation }) => {
   return (
@@ -17,34 +16,6 @@ const ConversationContent = ({ conversation }) => {
     <div className="ConversationContent">
       {conversation.messages.map(message => <li key={message.id}>{message.content}</li>)}
     </div>
-  );
-}
-
-const ChatInput = ({ conversation }) => {
-  const [inputText, setInputText] = useState('');
-
-  function sendMessage(event) {
-    event.preventDefault();
-
-    socket.emit("chat message", {
-      to: conversation.partner.id,
-      content: inputText,
-      attachment: null
-    })
-    setInputText('');
-  }
-
-  return (
-    <form className="ChatInputContainer" onSubmit={(event) => sendMessage(event)}>
-      <button>Attachment Icon</button>
-      <input
-        type="text"
-        value={inputText}
-        placeholder="Type your message here..."
-        onChange={event => setInputText(event.target.value)}
-      />
-      <input type="submit" value="Send"/>
-    </form>
   );
 }
 

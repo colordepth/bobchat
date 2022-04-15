@@ -1,14 +1,15 @@
 import { useDispatch } from "react-redux";
-import "../stylesheets/ConversationItem.css";
 import { setActiveConversationID } from "../slices/conversationSlice";
+
+import "../stylesheets/ConversationItem.css";
 
 const ConversationItem = ({ conversation }) => {
   const dispatch = useDispatch();
 
   return (
-    <div
+    <li
+      className="ConversationItem"  
       onClick={() => { dispatch(setActiveConversationID(conversation.partner.id)) }}
-      className="ConversationItem"
     >
       <span className="ConversationItemTitle">
         { conversation.partner.name }
@@ -16,7 +17,7 @@ const ConversationItem = ({ conversation }) => {
       <span className="ConversationItemContent">
         { conversation.messages.at(-1).content }
       </span>
-    </div>
+    </li>
   );
 }
 
