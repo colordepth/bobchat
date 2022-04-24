@@ -6,7 +6,10 @@
   "author": "Deep Sharma <deepsharma.cs@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "dotenv": "^16.0.0",
     "express": "^4.17.3",
+    "jsonwebtoken": "^8.5.1",
+    "mysql": "^2.18.1",
     "socket.io": "^4.4.1",
     "uuid": "^8.3.2"
   },
