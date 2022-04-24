@@ -1,28 +1,19 @@
 import socket from "../services/socket";
 
-export function loginWithUserID(userID) {
-  socket.auth = { userID };
-  socket.connect();
-}
-
-export function loginWithSessionID(sessionID) {  
-  if (!sessionID) {
+export function upgradeConnectionToSocket(token) {  
+  if (!token) {
     return;
   }
 
-  socket.auth = { sessionID };
+  socket.auth = { token };
   socket.connect();
 }
 
-export function setSessionListenerCallback(callback) {
-  socket.on("session", ({ sessionID, userID }) => {
-    socket.auth = { sessionID };
-    socket.userID = userID;
-    localStorage.setItem("session-id", sessionID);
-    callback(sessionID);
-  });
-
-  loginWithSessionID(localStorage.getItem("session-id"));
-
-  return () => socket.off("session");
+export function postLogin(userID) {
+  return fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userID })
+    })
+    .then(response => response.json());
 }

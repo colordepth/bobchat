@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
+import { Navigate } from "react-router-dom";
 
 import ConversationView from "../components/ConversationView";
-import Login from "../components/Login";
 import ConversationList from "../components/ConversationList";
 import socket from "../services/socket";
 import { setConversations, addMessageToConversations } from "../slices/conversationSlice";
@@ -27,9 +27,12 @@ const App = () => {
   useEffect(receiveMessage, []);
   useEffect(receiveConversationList, []);
 
+  if (!localStorage.getItem('token')) {
+    return <Navigate to='/login' />
+  }
+
   return (
     <div className="App">
-      {!sessionID && <Login setSessionID={setSessionID}/>}
       <ConversationList />
       <ConversationView />
     </div>
