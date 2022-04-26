@@ -10,12 +10,14 @@ const conversationSlice = createSlice({
   },
   reducers: {
     addMessageToConversations: (state, action) => {
-      const message = action.payload;
+      const { message, chatID } = action.payload;
 
       const targetConversation = state.conversations.find(conversation =>
-        conversation.partner.id === message.from ||
-        conversation.partner.id === message.to
+        conversation.partnerID === chatID ||
+        conversation.partnerID === chatID
       );
+
+      if (!targetConversation.messages) targetConversation.messages = [];
 
       targetConversation.messages.push(message);
     },
@@ -36,7 +38,7 @@ export const selectAllConversations = state => state.conversation.conversations;
 export const selectActiveConversationID = state => state.conversation.activeConversationID;
 export const selectConversationByPartnerID = id =>
   state => state.conversation.conversations && state.conversation.conversations.find(conversation =>
-    conversation.partner.id === id
+    conversation.partnerID === id
   );
 
 export default conversationSlice.reducer;

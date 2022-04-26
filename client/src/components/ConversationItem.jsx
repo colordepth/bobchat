@@ -6,16 +6,18 @@ import "../stylesheets/ConversationItem.css";
 const ConversationItem = ({ conversation }) => {
   const dispatch = useDispatch();
 
+  const chatID = conversation.partnerID;
+
   return (
     <li
       className="ConversationItem"  
-      onClick={() => { dispatch(setActiveConversationID(conversation.partner.id)) }}
+      onClick={() => { dispatch(setActiveConversationID(chatID)) }}
     >
       <span className="ConversationItemTitle">
-        { conversation.partner.name }
+        { conversation.name }
       </span>
       <span className="ConversationItemContent">
-        { conversation.messages.at(-1).content }
+        { conversation.messages ? conversation.messages.at(-1).text : '...' }
       </span>
     </li>
   );

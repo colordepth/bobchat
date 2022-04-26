@@ -31,7 +31,7 @@ const MessageNewEntity = () => {
     <>
       <Modal isOpen={modalIsOpen}>
         <div>
-          <input type="text" value="partnerID" />
+          <input type="text" />
           <button onClick={() => setModalIsOpen(false)}>Connect</button>
         </div>
       </Modal>
@@ -47,7 +47,7 @@ const ConversationList = () => {
   if (!conversations.length) return <EmptyConversationsList />;
 
   const ConversationItemsList = conversations.map(conversation => 
-    <ConversationItem conversation={ conversation } key={ conversation.partner.id } />
+    <ConversationItem conversation={ conversation } key={ conversation.partnerID } />
   );
 
   return (

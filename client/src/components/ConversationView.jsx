@@ -6,7 +6,7 @@ import "../stylesheets/ConversationView.css";
 const ConversationHeader = ({ conversation }) => {
   return (
     <div className="ConversationHeader">
-      {conversation.partner.name}
+      { conversation.name }
     </div>
   );
 }
@@ -14,7 +14,7 @@ const ConversationHeader = ({ conversation }) => {
 const ConversationContent = ({ conversation }) => {
   return (
     <div className="ConversationContent">
-      {conversation.messages.map(message => <li key={message.id}>{message.content}</li>)}
+      { conversation.messages && conversation.messages.map(message => <li key={message.partial_id}>{message.text}</li>) }
     </div>
   );
 }
@@ -23,7 +23,7 @@ const ConversationView = () => {
   const activeConversationID = useSelector(selectActiveConversationID);
   const activeConversation = useSelector(selectConversationByPartnerID(activeConversationID));
 
-  console.log(activeConversation);
+  console.log(activeConversation, activeConversationID);
   
   if (!activeConversation) {
     return (

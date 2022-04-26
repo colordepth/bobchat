@@ -1,6 +1,6 @@
-const { queryDB, commonQuery } = require('./services/db');
+const { queryExec, commonQuery } = require('./services/db');
 
-queryDB('SELECT * FROM bobchat_production.user')
+queryExec('SELECT * FROM bobchat_production.user')
   .then(results => console.log(results.length && results[0]))
   .catch(error => console.error(error));
 

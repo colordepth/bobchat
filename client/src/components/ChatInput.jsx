@@ -7,7 +7,7 @@ const ChatInput = ({ conversation }) => {
 
   function submitChatInput(event) {
     event.preventDefault();
-    sendMessage(conversation.partner.id, inputText, null);
+    sendMessage(conversation, inputText, null);
     setInputText("");
   }
 

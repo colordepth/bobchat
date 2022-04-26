@@ -17,11 +17,9 @@ loginRoute.post('/', async (req, res) => {
     return res.status(401).end();
   }
 
-  const token = await jwt.sign({
-    userID: userID
-  }, process.env.JWT_SECRET)
+  const token = await jwt.sign(userID, process.env.JWT_SECRET);
 
-  return res.json({userID: "hello", token})
+  return res.json({ userID, token })
 })
 
 module.exports = loginRoute;

@@ -23,7 +23,7 @@ const Login = () => {
 
   return (
     <Modal isOpen={true}>
-      <form className="LoginCard" onSubmit={event => postLogin(event, navigate)}>
+      <form className="LoginCard" onSubmit={loginSubmit}>
         <input
           type="text"
           name="userID"

@@ -4,6 +4,8 @@ import { Navigate } from "react-router-dom";
 
 import ConversationView from "../components/ConversationView";
 import ConversationList from "../components/ConversationList";
+import { getUserChats } from "../services/user";
+import { getMessagesFromChat } from "../services/chat";
 import socket from "../services/socket";
 import { setConversations, addMessageToConversations } from "../slices/conversationSlice";
 
@@ -11,12 +13,30 @@ import "../stylesheets/App.css";
 
 
 const App = () => {
-  const [ sessionID, setSessionID ] = useState(null);
   const dispatch = useDispatch();
 
-  function receiveConversationList() {
-    socket.on("conversation list", data => dispatch(setConversations(data)));
-    return () => socket.off("conversation list");
+  function fetchChats() {
+    async function fetch() {
+      const data = await getUserChats();
+      const chats = [...data.conversations, ...data.groups];
+      dispatch(setConversations(chats));
+
+      console.log(chats);
+      console.log("Fetching messages");
+
+      chats.forEach(async chat => {
+        const messages = await getMessagesFromChat(chat);
+        console.log(messages);
+        messages.forEach(message => {
+          dispatch(addMessageToConversations({
+            message,
+            chatID: chat.partnerID
+          }))
+        })
+      })
+    }
+    console.log("Fetching chats");
+    fetch();
   }
 
   function receiveMessage() {
@@ -25,7 +45,7 @@ const App = () => {
   }
 
   useEffect(receiveMessage, []);
-  useEffect(receiveConversationList, []);
+  useEffect(fetchChats, []);
 
   if (!localStorage.getItem('token')) {
     return <Navigate to='/login' />
