@@ -2,12 +2,17 @@ const jwt = require('jsonwebtoken');
 const { commonQuery } = require('./db');
 
 async function getUserFromToken(token) {
-  if (!(await jwt.verify(token, process.env.JWT_SECRET))) {
+  try {
+    if (!(await jwt.verify(token, process.env.JWT_SECRET))) {
+      return null;
+    }
+
+    const userID = await jwt.decode(token);
+    return await commonQuery.getUserByID(userID);
+  }
+  catch(err) {
     return null;
   }
-
-  const userID = await jwt.decode(token);
-  return await commonQuery.getUserByID(userID);
 }
 
 function getUserFromRequest(req) {

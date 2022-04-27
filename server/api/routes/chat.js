@@ -30,7 +30,7 @@ async function getChatFromUserID(userID) {
 
 chatRoute.get('/', async (req, res) => {
   const user = await getUserFromRequest(req);
-  // if (!user) return res.status(401).end();
+  if (!user) return res.status(401).end();
 
   const chat = await getChatFromUserID(user.phone);
   res.json(chat);
