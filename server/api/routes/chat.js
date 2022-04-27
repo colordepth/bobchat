@@ -10,7 +10,7 @@ async function getChatFromUserID(userID) {
   const conversationIDs = await commonQuery.getUserConversationsIDs(userID);
 
   const conversations = await Promise.all(conversationIDs.map(async id => {
-    const partner = (await impureQueries.getUsersInConversation(id)).find(user => user.id !== userID);
+    const partner = (await impureQueries.getUsersInConversation(id)).find(user => user.phone !== userID);
     return {
       ...partner,
       id,
@@ -42,7 +42,29 @@ chatRoute.get('/group/:id', async (req, res) => {
 
   if (!user) return res.status(401).end();
 
+  // Check if user belongs to group
+
   const messages = await impureQueries.getMessagesInGroup(req.params.id, offset, count);
+
+  res.json(messages);
+});
+
+chatRoute.get('/group', async (req, res) => {
+  const user = await getUserFromRequest(req);
+
+  // if (!user) return res.status(401).end();
+
+  const messages = await commonQuery.getAllGroupMessages(806501618);
+
+  res.json(messages);
+});
+
+chatRoute.get('/conversation', async (req, res) => {
+  const user = await getUserFromRequest(req);
+
+  // if (!user) return res.status(401).end();
+
+  const messages = await commonQuery.getAllConversationMessages(806501618);
 
   res.json(messages);
 });

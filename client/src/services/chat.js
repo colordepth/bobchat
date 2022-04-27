@@ -3,6 +3,7 @@ import socket from "./socket";
 export function sendMessage(conversation, content, attachment) {
   socket.emit("chat message", {
     to: conversation.id,
+    toPerson: conversation.phone,
     isGroup: !conversation.phone,
     content,
     attachment

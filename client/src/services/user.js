@@ -20,3 +20,27 @@ export function setPersonalInfo({ about, lastSeenVisibility, onlineStatusVisibil
     })
     .then(res => res.json());
 }
+
+export function postContact(contactNumber) {
+  return fetch('/user/contact', {
+      method: 'POST',
+      headers: {
+        'Authorization': `bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(contactNumber)
+    })
+    .then(res => res.json());
+}
+
+export function postConversation(contactNumber) {
+  return fetch('/user/conversation', {
+      method: 'POST',
+      headers: {
+        'Authorization': `bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(contactNumber)
+    })
+    .then(res => res.json());
+}

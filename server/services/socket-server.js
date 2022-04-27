@@ -1,5 +1,5 @@
 const socketio = require("socket.io");
-const { queryExec, commonQuery } = require('./db');
+const { queryExec, commonQuery, impureQueries } = require('./db');
 const { getUserIDfromToken } = require('./auth');
 
 const io = new socketio.Server();
@@ -44,6 +44,11 @@ io.on("connection", async socket => {
     console.log("message received", data, targetRoom);
 
     io.to(targetRoom).emit("chat message", {...data, ...message, sender: socket.userID});
+    
+    if (messageBelongsToGroup)
+      impureQueries.addMessageToGroup(message, data.to, socket.userID);
+    else 
+      impureQueries.addMessageToConversation(message, data.to, socket.userID);
   })
 })
 

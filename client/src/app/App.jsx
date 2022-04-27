@@ -6,7 +6,6 @@ import ConversationView from "../components/ConversationView";
 import ConversationList from "../components/ConversationList";
 import { getUserChats } from "../services/user";
 import { getMessagesFromChat } from "../services/chat";
-import socket from "../services/socket";
 import { upgradeConnectionToSocket } from "../services/auth";
 import { setConversations, addMessageToConversations, setActiveConversationID } from "../slices/conversationSlice";
 
@@ -26,7 +25,7 @@ const App = () => {
       const chats = [...data.conversations, ...data.groups];
       dispatch(setConversations(chats));
 
-      console.log(chats);
+      console.log(data);
       console.log("Fetching messages");
 
       chats.forEach(async chat => {
@@ -51,8 +50,6 @@ const App = () => {
 
     console.log("Connecting to socket");
     upgradeConnectionToSocket(localStorage.getItem('token'));
-    // socket.on("chat message", message => dispatch(addMessageToConversations(message)));
-    return () => socket.off("chat message");
   }
 
   useEffect(receiveMessage, [ location ]);

@@ -32,4 +32,18 @@ userRoute.get('/:userID', async (req, res) => {
   res.json(user);
 })
 
+userRoute.post('/contact', async (req, res) => {
+  const user = getUserFromRequest(req);
+
+  if (!user) return res.status(401).end();
+
+  const contact = !isNaN(req.body) && await commonQuery.getUserByID(req.body);
+
+  if (!contact) return res.status(400).end();
+
+  commonQuery.addContact(user.id, contact.id);
+
+  res.json(contact);
+})
+
 module.exports = userRoute;

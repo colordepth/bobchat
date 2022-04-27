@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { selectAllConversations } from "../slices/conversationSlice";
+import { postContact } from "../services/user";
 import ConversationItem from "./ConversationItem";
 import Modal from "./Modal";
 
@@ -26,16 +27,44 @@ const EmptyConversationsList = () => {
 
 const MessageNewEntity = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [contactNumber, setContactNumber] = useState('');
+  const dispatch = useDispatch();
+
+  function onClickContactPost() {
+    setModalIsOpen(false);
+    postContact(contactNumber)
+      .then(res => {
+        console.log("add contact", res);
+      })
+      .catch(err => {
+        alert("User doesn't exist!");
+      })
+  }
+
+  function addChat() {
+    var choice = prompt("Choose type of chat (group/conversation)");
+
+    if (choice.toLocaleLowerCase() === 'group') {
+      const groupName = prompt("Enter group name");
+    }
+    else if (choice.toLocaleLowerCase() === 'conversation') {
+      
+    }
+    else {
+      alert("Invalid choice!");
+    }
+  }
 
   return (
     <>
       <Modal isOpen={modalIsOpen}>
         <div>
-          <input type="text" />
-          <button onClick={() => setModalIsOpen(false)}>Connect</button>
+          <input type="text" value={contactNumber} onChange={event => setContactNumber(event.target.value)} />
+          <button onClick={onClickContactPost}>Connect</button>
         </div>
       </Modal>
-      <button onClick={() => setModalIsOpen(true)}>Message New User</button>
+      <button onClick={() => setModalIsOpen(true)}>Add Contact</button>
+      <button onClick={addChat}>Add Conversation/Group</button>
     </>
   );
 }
