@@ -7,6 +7,7 @@ import ConversationList from "../components/ConversationList";
 import { getUserChats } from "../services/user";
 import { getMessagesFromChat } from "../services/chat";
 import socket from "../services/socket";
+import { upgradeConnectionToSocket } from "../services/auth";
 import { setConversations, addMessageToConversations } from "../slices/conversationSlice";
 
 import "../stylesheets/App.css";
@@ -40,7 +41,9 @@ const App = () => {
   }
 
   function receiveMessage() {
-    socket.on("chat message", message => dispatch(addMessageToConversations(message)));
+    console.log("Connecting to socket");
+    upgradeConnectionToSocket(localStorage.getItem('token'));
+    // socket.on("chat message", message => dispatch(addMessageToConversations(message)));
     return () => socket.off("chat message");
   }
 

@@ -8,21 +8,16 @@ io.use((socket, next) => {
 
   const { token } = socket.handshake.auth;
 
-  socket.userID = userSession.userID;
+  // socket.userID = userSession.userID;
   next();
 })
 
 io.on("connection", (socket) => {
   console.log("user connected");
 
-  const user = users.find(user => user.id === socket.userID);
-
-  socket.join(socket.userID);         // For private messages
-  // TODO:  For group messages
-
   socket.on("disconnect", () => {
     console.log("user disconnected");
-    user.onlineStatus = false;
+    // user.onlineStatus = false;
     // broadcastOnlineStatus(socket);
   });
 
