@@ -7,7 +7,7 @@ const chatRoute = express.Router();
 async function getChatFromUserID(userID) {
   const contacts = await commonQuery.getUserContacts(userID);
   const groupsInfo = await impureQueries.getUserGroups(userID);
-  const conversationIDs = await commonQuery.getUserConversationIDs(userID);
+  const conversationIDs = await commonQuery.getUserConversationsIDs(userID);
 
   const conversations = await Promise.all(conversationIDs.map(async id => {
     const partner = (await impureQueries.getUsersInConversation(id)).find(user => user.id !== userID);

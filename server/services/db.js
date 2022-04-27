@@ -89,7 +89,7 @@ function getUserIDsInGroup(groupID) {
   .then(results => results.map(row => row.user_phone));
 }
 
-function getUserGroupIDs(userID) {
+function getUserGroupsIDs(userID) {
   return queryExec(`
     SELECT group_id
     FROM bobchat_production.user_in_group
@@ -99,7 +99,7 @@ function getUserGroupIDs(userID) {
 }
 
 async function getUserGroups(userID) {
-  const groupIDs = await getUserGroupIDs(userID);
+  const groupIDs = await getUserGroupsIDs(userID);
   const groups = Promise.all(groupIDs.map(groupID => getGroupByID(groupID)));
 
   return groups;
@@ -117,15 +117,6 @@ async function getUsersInGroup(conversationID) {
   const users = Promise.all(userIDs.map(userID => getUserByID(userID)));
 
   return users;
-}
-
-function getUserConversationIDs(userID) {
-  return queryExec(`
-    SELECT conversation_id
-    FROM bobchat_production.user_in_conversation
-    WHERE user_phone = "${userID}"
-  `)
-  .then(results => results.map(row => row.conversation_id));
 }
 
 function getMessagesPartialIDsInConversation(conversationID) {
@@ -193,9 +184,9 @@ module.exports = {
   queryExec,
   commonQuery: {
     getUserByID, getGroupByID, getMessageByPartialID, getUserIDsInConversation,
-    getUserIDsInGroup, getUserConversationIDs, getMessagesPartialIDsInConversation,
+    getUserIDsInGroup, getMessagesPartialIDsInConversation,
     getMessagesPartialIDsInGroup, getMessageReports, getCreatorOfMessage, getUserContacts,
-    getUserConversationsIDs, getUserGroupIDs
+    getUserConversationsIDs, getUserGroupsIDs
   },
   // TODO: Modify impure queries to get result in a single query
   impureQueries: {
