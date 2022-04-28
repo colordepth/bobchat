@@ -15,8 +15,8 @@ const Login = () => {
 
     postLogin(userID)
       .then(data => {
-        localStorage.setItem('userID', data.userID);
-        localStorage.setItem('token', data.token);
+        sessionStorage.setItem('userID', data.userID);
+        sessionStorage.setItem('token', data.token);
         navigate('/');
       })
       .catch(error => {
@@ -30,8 +30,8 @@ const Login = () => {
     postRegister(userID, name, about)
       .then(data => {
         alert("User registered successfully!");
-        localStorage.setItem('userID', data.userID);
-        localStorage.setItem('token', data.token);
+        sessionStorage.setItem('userID', data.userID);
+        sessionStorage.setItem('token', data.token);
         navigate('/');
       })
       .catch(error => {

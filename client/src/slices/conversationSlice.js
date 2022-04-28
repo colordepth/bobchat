@@ -9,7 +9,9 @@ const conversationSlice = createSlice({
     activeConversationID: null,
     contacts: null,
     messages: null,
-    selfInfo: null
+    selfInfo: null,
+    onlineUsers: [],
+    readReceipts: []
   },
   reducers: {
     clearChat: (state, action) => {
@@ -44,11 +46,24 @@ const conversationSlice = createSlice({
     },
     setSelfInfo: (state, action) => {
       state.selfInfo = action.payload;
+    },
+    setOnline: (state, action) => {
+      state.onlineUsers.push(action.payload);
+    },
+    setOffline: (state, action) => {
+      state.onlineUsers = state.onlineUsers.filter(phone => phone != action.payload);
+    },
+    setReadReceipts: (state, action) => {
+      console.log("Receipt", action.payload);
+      state.readReceipts = action.payload;
     }
   }
 })
 
-export const { storeMessage, setActiveConversationID, setConversations, addContact, clearChat, setSelfInfo } = conversationSlice.actions;
+export const {
+  storeMessage, setActiveConversationID, setConversations, addContact,
+  clearChat, setSelfInfo, setOnline, setOffline, setReadReceipts
+} = conversationSlice.actions;
 
 export const selectAllConversations = state => state.conversation.conversations;
 export const selectActiveConversationID = state => state.conversation.activeConversationID;
@@ -59,5 +74,7 @@ export const selectConversationByPartnerID = id =>
 export const selectAllContacts = state => state.conversation.contacts;
 export const selectMessages = state => state.conversation.messages;
 export const selectSelfInfo = state => state.conversation.selfInfo;
+export const selectOnlineUsers = state => state.conversation.onlineUsers;
+export const selectReadReceipts = state => state.conversation.readReceipts;
 
 export default conversationSlice.reducer;

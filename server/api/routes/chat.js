@@ -34,21 +34,21 @@ chatRoute.get('/', async (req, res) => {
   const user = await getUserFromRequest(req);
   if (!user) return res.status(401).end();
 
+  commonQuery.setDeliveredTime(user.phone);
+
   const chat = await getChatFromUserID(user.phone);
   res.json(chat);
 });
 
-chatRoute.get('/group/:id', async (req, res) => {
+chatRoute.patch('/group/:id', async (req, res) => {
   const user = await getUserFromRequest(req);
-  const { offset, count } = req.query;
 
   if (!user) return res.status(401).end();
 
-  // Check if user belongs to group
-
-  const messages = await impureQueries.getMessagesInGroup(req.params.id, offset, count);
-
-  res.json(messages);
+  console.log("Group received patch");
+  const messageIDs = await commonQuery.getMessagesPartialIDsInGroup(req.params.id);
+  await commonQuery.setSeenTimeMessages(user.phone, messageIDs);
+  res.status(200).end();
 });
 
 chatRoute.get('/group', async (req, res) => {
@@ -95,15 +95,26 @@ chatRoute.get('/conversation', async (req, res) => {
   res.json(messages);
 });
 
-chatRoute.get('/conversation/:id', async (req, res) => {
+chatRoute.patch('/conversation/:id', async (req, res) => {
   const user = await getUserFromRequest(req);
-  const { offset, count } = req.query;
 
   if (!user) return res.status(401).end();
 
-  const messages = await impureQueries.getMessagesInConversation(req.params.id, offset, count);
-
-  res.json(messages);
+  console.log("Conversation received patch");
+  const messageIDs = await commonQuery.getMessagesPartialIDsInConversation(req.params.id);
+  await commonQuery.setSeenTimeMessages(user.phone, messageIDs);
+  res.status(200).end();
 });
+
+chatRoute.get('/receipts', async(req, res) => {
+  const user = await getUserFromRequest(req);
+
+  if (!user) return res.status(401).end();
+
+  const groupReceipts = await commonQuery.getGroupReceipts(user.phone);
+  const conversationReceipts = await commonQuery.getConversationReceipts(user.phone);
+
+  res.json({receipts: [...groupReceipts, ...conversationReceipts]});
+})
 
 module.exports = chatRoute;

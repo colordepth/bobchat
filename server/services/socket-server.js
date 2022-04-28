@@ -16,19 +16,31 @@ io.use(async (socket, next) => {
 
 io.on("connection", async socket => {
   console.log("user connected");
+  // Broadcast user connection
+  socket.broadcast.emit("user online", socket.userID);
+
+  // Fetch online users
+  io.fetchSockets()
+    .then(sockets => {
+      sockets.forEach(onlineSocket => {
+        socket.emit("user online", onlineSocket.userID);
+      })
+    })
 
   const conversationIDs = await commonQuery.getUserConversationsIDs(socket.userID);
   const groupIDs = await commonQuery.getUserGroupsIDs(socket.userID);
 
   conversationIDs.forEach(id => socket.join('conversation ' + id));
   groupIDs.forEach(id => socket.join('group ' + id));
+  socket.join('user ' + socket.userID);
 
   console.log(socket.rooms);
 
-  socket.once("disconnect", () => {
-    console.log("user disconnected");
-    // user.onlineStatus = false;
-    // broadcastOnlineStatus(socket);
+  socket.once("disconnect", async () => {
+    const onlineUserConnections = (await io.in('user ' + socket.userID).fetchSockets()).length;
+    if (onlineUserConnections == 0)
+      socket.broadcast.emit("user offline", socket.userID);
+    console.log("user disconnected, remaining user sockets:", onlineUserConnections);
   });
 
   socket.on("chat message", data => {

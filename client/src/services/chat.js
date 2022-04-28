@@ -15,14 +15,14 @@ export async function getMessagesFromChat() {
 
   promises.push(
     fetch(`/chat/group`, {
-      headers: { Authorization: `bearer ${localStorage.getItem('token')}` }
+      headers: { Authorization: `bearer ${sessionStorage.getItem('token')}` }
     })
       .then(res => res.json())
   );
 
   promises.push(
     fetch(`/chat/conversation`, {
-      headers: { Authorization: `bearer ${localStorage.getItem('token')}` }
+      headers: { Authorization: `bearer ${sessionStorage.getItem('token')}` }
     })
       .then(res => res.json())
   );

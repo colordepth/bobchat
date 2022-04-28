@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { selectActiveConversationID, selectAllContacts, selectConversationByPartnerID, selectMessages, selectSelfInfo } from "../slices/conversationSlice";
+import { selectActiveConversationID, selectAllContacts, selectConversationByPartnerID, selectMessages, selectReadReceipts, selectSelfInfo } from "../slices/conversationSlice";
 import ChatInput from "./ChatInput";
 import "../stylesheets/ConversationView.css";
 import { useEffect, useRef } from "react";
@@ -10,7 +10,9 @@ const ConversationHeader = ({ conversation }) => {
   const self = useSelector(selectSelfInfo);
 
   return (
-    <div className="ConversationHeader">
+    <div className="ConversationHeader"
+      onClick={() => alert(`${conversation.name}\nAbout: ${conversation.about || conversation.description}\n${conversation.phone ? conversation.phone : ''}`)}
+    >
       <div>{ conversation.name } <br/></div>
       <div>
       {
@@ -25,13 +27,19 @@ const ConversationHeader = ({ conversation }) => {
 
 const MessageCloud = ({ message }) => {
   const date = new Date(message.creation_time);
-  const contacts = useSelector(selectAllContacts);
   const self = useSelector(selectSelfInfo);
+  const contacts = useSelector(selectAllContacts);
   const user = contacts && contacts.concat(self || {}).find(user => user.phone == message.creator_id);
 
+  const readReceipts = useSelector(selectReadReceipts)
+    .filter(receipt => receipt.partial_id == message.partial_id)
+    .filter(receipt => receipt.receiver_id != self.phone);
+
   function downloadAttachment() {
+    if (!message.attachment) return;
+
     fetch(`/chat/attachment/${message.partial_id}`, {
-      headers: { Authorization: `bearer ${localStorage.getItem('token')}` }
+      headers: { Authorization: `bearer ${sessionStorage.getItem('token')}` }
     })
       .then(res => res.json())
       .then(data => {
@@ -48,6 +56,31 @@ const MessageCloud = ({ message }) => {
       })
   }
 
+  function showReceiptInfo() {
+    var receiptInfo = "";
+    readReceipts.forEach(curr => {
+      console.log(curr);
+      const contact = contacts && contacts.concat(self || {}).find(contact => contact.phone == curr.receiver_id);
+      receiptInfo += (
+        ("\n" + (contact ? contact.name + ' | ' : '') + curr.receiver_id + "\n" + "Delivered Time: " + (curr.delivered_time ? curr.delivered_time + ' ' + ' ☑️☑️' : "Not delivered ☑️") + "\n" + "Seen Time: " + (curr.seen_time ? curr.seen_time + ' ' + ' ✅✅' : "Not seen") + "\n")
+      );
+    }, "");
+
+    alert(receiptInfo);
+  }
+
+  const textStyle = {};
+
+  if (self && user && self.phone == user.phone)
+    textStyle.paddingRight = '4rem';
+  
+  if (message.attachment) {
+    textStyle.color = '#0066dd';
+    textStyle.textDecoration = 'underline';
+  }
+
+  console.log("A", self, user);
+
   return (
     <span className="MessageCloud"
       title={message.creator_id}
@@ -58,11 +91,14 @@ const MessageCloud = ({ message }) => {
     >
       <span
         style={self && user && self.phone == user.phone ? {color: '#0a9337'} : {}}
-        onClick={downloadAttachment}
       >
-        { (user ? user.name : message.creator_id) + (message.attachment ? ' 📎' : '') }
+        { (user ? user.name : message.creator_id) + (message.attachment ? ' 📎' : '') + (
+          (self && message.creator_id == self.phone) ? (readReceipts.length == 0 || readReceipts.find(receipt => !receipt.delivered_time) ? '☑️' : (
+            readReceipts.find(receipt => !receipt.seen_time) ? '☑️☑️' : '✅✅'
+          )) : ''
+        ) }
       </span>
-      <span style={self && user && self.phone == user.phone ? {paddingRight: '4rem'} : {}}>
+      <span style={textStyle} onClick={() => {showReceiptInfo(); downloadAttachment();}}>
         { message.text }
       </span>
       <span>
@@ -87,6 +123,13 @@ const ConversationContent = ({ conversation }) => {
     && conversationContentRef.current
     && conversationContentRef.current.scrollTo(0, 9999999999);
   })
+
+  useEffect(() => {
+    fetch(`/chat/${conversation.isGroup ? 'group' : 'conversation'}/${conversation.id}`, {
+      method: 'PATCH',
+      headers: { Authorization: `bearer ${sessionStorage.getItem('token')}` }
+    })
+  }, [conversation]);
 
   return (
     <div className="ConversationContent" ref={conversationContentRef}>

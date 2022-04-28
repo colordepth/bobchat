@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { selectMessages, setActiveConversationID } from "../slices/conversationSlice";
+import { selectMessages, selectOnlineUsers, setActiveConversationID } from "../slices/conversationSlice";
 
 import "../stylesheets/ConversationItem.css";
 
@@ -15,13 +15,16 @@ const ConversationItem = ({ conversation }) => {
     return message.conversation_id === conversation.id;
   });
 
+  const onlineUsers = useSelector(selectOnlineUsers);
+  const onlineState = !conversation.isGroup && onlineUsers.find(onlineUser => onlineUser == conversation.partnerID);
+
   return (
     <li
       className="ConversationItem"  
       onClick={() => { dispatch(setActiveConversationID(chatID)) }}
     >
       <span className="ConversationItemTitle">
-        { conversation.name }
+        { conversation.name + '  ' + (conversation.isGroup ? '' : (onlineState ? '🟢' : '🔴'))}
       </span>
       <span className="ConversationItemContent">
         { currentMessages && currentMessages.length ? currentMessages.at(-1).text : <i></i> }

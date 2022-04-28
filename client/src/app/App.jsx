@@ -4,10 +4,11 @@ import { Navigate, useLocation } from "react-router-dom";
 
 import ConversationView from "../components/ConversationView";
 import ConversationList from "../components/ConversationList";
-import { getSelfInfo, getUserChats } from "../services/user";
+import { getSelfInfo, getUserChats, getReadReceipts } from "../services/user";
 import { getMessagesFromChat } from "../services/chat";
 import { upgradeConnectionToSocket } from "../services/auth";
-import { setConversations, storeMessage, setActiveConversationID, addContact, selectSelfInfo, selectMessages, clearChat, setSelfInfo } from "../slices/conversationSlice";
+import { setConversations, storeMessage, setActiveConversationID, addContact, selectSelfInfo, selectMessages, clearChat, setSelfInfo, setOnline, setOffline, setReadReceipts } from "../slices/conversationSlice";
+import socket from "../services/socket";
 
 import "../stylesheets/App.css";
 
@@ -31,24 +32,31 @@ const App = () => {
       console.log(messages);
       messages.forEach(message => dispatch(storeMessage(message)));
       getSelfInfo().then(self => dispatch(setSelfInfo(self)));
+      getReadReceipts().then(receipts => dispatch(setReadReceipts(receipts)));
     }
 
-    if (!localStorage.getItem('token')) return;
+    if (!sessionStorage.getItem('token')) return;
     console.log("Fetching chats");
     fetch();
   }
 
-  function receiveMessage() {
-    if (!localStorage.getItem('token')) return;
-
-    console.log("Connecting to socket");
-    upgradeConnectionToSocket(localStorage.getItem('token'));
+  function dispatchUserStatus() {
+    socket.on('user online', data => dispatch(setOnline(data)));
+    socket.on('user offline', data => dispatch(setOffline(data)));
   }
 
+  function receiveMessage() {
+    if (!sessionStorage.getItem('token')) return;
+
+    console.log("Connecting to socket");
+    upgradeConnectionToSocket(sessionStorage.getItem('token'));
+  }
+
+  useEffect(dispatchUserStatus, []);
   useEffect(receiveMessage, [ location ]);
   useEffect(fetchChats, [ location ]);
 
-  if (!localStorage.getItem('token')) {
+  if (!sessionStorage.getItem('token')) {
     return <Navigate to='/login' />
   }
 

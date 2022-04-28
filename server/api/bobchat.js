@@ -9,7 +9,7 @@ const chatRoute = require(path.join(__dirname, "routes/chat"));
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "build")));
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 
 app.use('/login', loginRoute);
 app.use('/register', registerRoute);

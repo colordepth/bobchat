@@ -4,13 +4,20 @@ const { commonQuery, impureQueries } = require('../../services/db');
 
 const userRoute = express.Router();
 
-userRoute.post('/', async (req, res) => {
+userRoute.put('/', async (req, res) => {
   const user = await getUserFromRequest(req);
 
   if (!user) return res.status(401).end();
 
   console.log('received POST', req.body);
-  // commonQuery.updateUser(req.body.name);
+  commonQuery.updateUser(user.phone, req.body)
+    .then(() => {
+      res.json({...user, ...req.body});
+    })
+    // .catch(() => {
+    // malformatted
+    //   res.status(400).end()
+    // })
 })
 
 userRoute.get('/', async (req, res) => {
