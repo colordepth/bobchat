@@ -45,7 +45,7 @@ io.on("connection", async socket => {
 
     if (messageBelongsToGroup)
       impureQueries.addMessageToGroup(message, data.to, socket.userID);
-    else 
+    else
       impureQueries.addMessageToConversation(message, data.to, socket.userID);
     
     const socketPayload = {

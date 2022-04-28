@@ -324,24 +324,30 @@ queryExec(`
 
 async function addMessageToGroup(message, groupID, creatorID) {
   console.log("Last partial id", lastPartialID);
+
   lastPartialID += 1;
 
-  db.query("INSERT INTO `message` SET ?", {
-    partial_id: lastPartialID,
-    text: message.text,
-    creation_time: message.creation_time,
-    attachment: Buffer.from(message.attachment)
-  });
+  await new Promise((resolve, reject) => {
+    db.query("INSERT INTO `message` SET ?", {
+      partial_id: lastPartialID,
+      text: message.text,
+      creation_time: message.creation_time,
+      attachment: message.attachment && Buffer.from(message.attachment)
+    }, function (err, result) {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  })
 
   queryExec(`
     INSERT INTO message_belongs_to_group (message_partial_id, group_id)
     VALUES
-      (${lastPartialID + 1}, ${groupID})
+      (${lastPartialID}, ${groupID})
   `);
   queryExec(`
     INSERT INTO user_creates_message (user_phone, message_partial_id)
     VALUES
-      (${creatorID}, ${lastPartialID + 1})
+      (${creatorID}, ${lastPartialID})
   `);
 }
 
@@ -350,22 +356,27 @@ async function addMessageToConversation(message, conversationID, creatorID) {
 
   lastPartialID += 1;
 
-  db.query("INSERT INTO `message` SET ?", {
-    partial_id: lastPartialID,
-    text: message.text,
-    creation_time: message.creation_time,
-    attachment: Buffer.from(message.attachment)
-  });
+  await new Promise((resolve, reject) => {
+    db.query("INSERT INTO `message` SET ?", {
+      partial_id: lastPartialID,
+      text: message.text,
+      creation_time: message.creation_time,
+      attachment: message.attachment && Buffer.from(message.attachment)
+    }, function (err, result) {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  })
 
   queryExec(`
     INSERT INTO message_belongs_to_conversation (message_partial_id, conversation_id)
     VALUES
-      (${lastPartialID + 1}, ${conversationID})
+      (${lastPartialID}, ${conversationID})
   `);
   queryExec(`
     INSERT INTO user_creates_message (user_phone, message_partial_id)
     VALUES
-      (${creatorID}, ${lastPartialID + 1})
+      (${creatorID}, ${lastPartialID})
   `);
 }
 
