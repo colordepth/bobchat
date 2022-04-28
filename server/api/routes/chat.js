@@ -14,7 +14,8 @@ async function getChatFromUserID(userID) {
     return {
       ...partner,
       id,
-      partnerID: partner.phone
+      partnerID: partner.phone,
+      isGroup: false
     }
   }));
 
@@ -22,7 +23,8 @@ async function getChatFromUserID(userID) {
     return {
       ...groupInfo,
       partnerID: groupInfo.id,
-      users: await impureQueries.getUsersInGroup(groupInfo.id)
+      users: await impureQueries.getUsersInGroup(groupInfo.id),
+      isGroup: true
     }
   }));
   return { contacts, groups, conversations };
@@ -52,9 +54,9 @@ chatRoute.get('/group/:id', async (req, res) => {
 chatRoute.get('/group', async (req, res) => {
   const user = await getUserFromRequest(req);
 
-  // if (!user) return res.status(401).end();
+  if (!user) return res.status(401).end();
 
-  const messages = await commonQuery.getAllGroupMessages(806501618);
+  const messages = await commonQuery.getAllGroupMessages(user.phone);
 
   res.json(messages);
 });
@@ -62,9 +64,9 @@ chatRoute.get('/group', async (req, res) => {
 chatRoute.get('/conversation', async (req, res) => {
   const user = await getUserFromRequest(req);
 
-  // if (!user) return res.status(401).end();
+  if (!user) return res.status(401).end();
 
-  const messages = await commonQuery.getAllConversationMessages(806501618);
+  const messages = await commonQuery.getAllConversationMessages(user.phone);
 
   res.json(messages);
 });

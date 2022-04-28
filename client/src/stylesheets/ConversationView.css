@@ -2,10 +2,50 @@
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  padding: 0.4rem;
+  /* padding: 0.4rem; */
 }
 
 .ConversationContent {
   flex-grow: 1;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 0.2rem;
+}
+
+.MessageCloud {
+  background-color: rgb(163, 244, 158);
+  color: black;
+  border-radius: 0.4rem;
+  margin: 1rem;
+  padding: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  max-width: 40%;
+}
+
+.MessageCloud > span:first-child {
+  font-weight: 600;
+  color: rgb(50, 73, 129);
+  font-size: 12px;
+  margin-top: -2px;
+}
+
+.MessageCloud > span:nth-child(2) {
+  font-size: 14px;
+  padding: 5px 0;
+}
+
+.MessageCloud > span:last-child {
+  align-self: flex-end;
+  font-size: 11px;
+  color: rgb(44, 60, 51);
+}
+
+.ConversationHeader {
+  background-color: #026855;
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

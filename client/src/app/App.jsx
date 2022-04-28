@@ -4,10 +4,10 @@ import { Navigate, useLocation } from "react-router-dom";
 
 import ConversationView from "../components/ConversationView";
 import ConversationList from "../components/ConversationList";
-import { getUserChats } from "../services/user";
+import { getSelfInfo, getUserChats } from "../services/user";
 import { getMessagesFromChat } from "../services/chat";
 import { upgradeConnectionToSocket } from "../services/auth";
-import { setConversations, addMessageToConversations, setActiveConversationID, addContact } from "../slices/conversationSlice";
+import { setConversations, storeMessage, setActiveConversationID, addContact, selectSelfInfo, selectMessages, clearChat, setSelfInfo } from "../slices/conversationSlice";
 
 import "../stylesheets/App.css";
 
@@ -18,8 +18,7 @@ const App = () => {
 
   function fetchChats() {
     async function fetch() {
-      dispatch(setConversations([]));
-      dispatch(setActiveConversationID(null));
+      dispatch(clearChat());
 
       const data = await getUserChats();
       const chats = [...data.conversations, ...data.groups];
@@ -28,17 +27,10 @@ const App = () => {
 
       console.log(data);
       console.log("Fetching messages");
-
-      chats.forEach(async chat => {
-        const messages = await getMessagesFromChat(chat);
-        console.log(messages);
-        messages.forEach(message => {
-          dispatch(addMessageToConversations({
-            message,
-            chatID: chat.partnerID
-          }))
-        })
-      })
+      const messages = await getMessagesFromChat();
+      console.log(messages);
+      messages.forEach(message => dispatch(storeMessage(message)));
+      getSelfInfo().then(self => dispatch(setSelfInfo(self)));
     }
 
     if (!localStorage.getItem('token')) return;

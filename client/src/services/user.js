@@ -2,6 +2,13 @@ export function getUserInfo(userID) {
   return fetch('/user/' + userID);
 }
 
+export function getSelfInfo() {
+  return fetch('/user', {
+    headers: { Authorization: `bearer ${localStorage.getItem('token')}` }
+  })
+  .then(res => res.json());
+}
+
 export function getUserChats() {
   return fetch('/chat', {
       headers: { Authorization: `bearer ${localStorage.getItem('token')}` }

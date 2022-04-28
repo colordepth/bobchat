@@ -8,21 +8,22 @@ const conversationSlice = createSlice({
     conversations: null,
     activeConversationID: null,
     contacts: null,
+    messages: null,
     selfInfo: null
   },
   reducers: {
-    addMessageToConversations: (state, action) => {
-      const { message, chatID } = action.payload;
-      console.log(32, action.payload);
+    clearChat: (state, action) => {
+      state.conversations = [];
+      state.contacts = [];
+      state.messages = [];
+      state.activeConversationID = null;
+    },
+    storeMessage: (state, action) => {
+      const message = action.payload;
 
-      const targetConversation = state.conversations.find(conversation =>
-        conversation.partnerID === chatID ||
-        conversation.partnerID === message.to
-      );
+      if (!state.messages) state.messages = [];
 
-      if (!targetConversation.messages) targetConversation.messages = [];
-
-      targetConversation.messages.push(message);
+      state.messages.push(message);
     },
     setActiveConversationID: (state, action) => {
       const partnerID = action.payload;
@@ -47,7 +48,7 @@ const conversationSlice = createSlice({
   }
 })
 
-export const { addMessageToConversations, setActiveConversationID, setConversations, addContact } = conversationSlice.actions;
+export const { storeMessage, setActiveConversationID, setConversations, addContact, clearChat, setSelfInfo } = conversationSlice.actions;
 
 export const selectAllConversations = state => state.conversation.conversations;
 export const selectActiveConversationID = state => state.conversation.activeConversationID;
@@ -56,5 +57,7 @@ export const selectConversationByPartnerID = id =>
     conversation.partnerID === id
   );
 export const selectAllContacts = state => state.conversation.contacts;
+export const selectMessages = state => state.conversation.messages;
+export const selectSelfInfo = state => state.conversation.selfInfo;
 
 export default conversationSlice.reducer;

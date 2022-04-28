@@ -9,31 +9,10 @@
 
 .ConversationList > li {
   list-style: none;
+  padding: 0.2rem 1.5rem 0.4rem 1.5rem;
+  cursor: pointer;
 }
 
-.MessageCloud {
-  background-color: rgb(163, 244, 158);
-  color: black;
-  border-radius: 0.4rem;
-  margin: 1rem;
-  padding: 0.4rem;
-  display: flex;
-  flex-direction: column;
-}
-
-.MessageCloud > div:first-child {
-  font-weight: 600;
-  color: rgb(50, 73, 129);
-  font-size: 12px;
-  margin-top: -2px;
-}
-
-.MessageCloud > div:nth-child(2) {
-  font-size: 14px;
-  padding: 5px 0;
-}
-
-.MessageCloud > div:last-child {
-  align-self: flex-end;
-  font-size: 12px;
+.ConversationList > li:hover {
+  background-color: #026855;
 }

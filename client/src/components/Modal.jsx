@@ -4,8 +4,6 @@ import '../stylesheets/Modal.css';
 const Modal = ({ children, isOpen }) => {
   const modalRef = useRef();
 
-  console.log(isOpen);
-
   function centerModal() {
     const width = modalRef.current.getBoundingClientRect().width;
     const height = modalRef.current.getBoundingClientRect().height;

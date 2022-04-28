@@ -69,7 +69,6 @@ const AddNewContact = () => {
         dispatch(addContact(res));
       })
       .catch(err => {
-        console.log("Ah", err);
         alert("User doesn't exist!");
       })
   }

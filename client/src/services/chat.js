@@ -10,11 +10,24 @@ export function sendMessage(conversation, content, attachment) {
   })
 }
 
-export function getMessagesFromChat(chat) {
-  let chatType  = chat.phone ? 'conversation' : 'group';
+export async function getMessagesFromChat() {
+  const promises = [];
 
-  return fetch(`/chat/${chatType}/${chat.id}`, {
-    headers: { Authorization: `bearer ${localStorage.getItem('token')}` }
-  })
-    .then(res => res.json())
+  promises.push(
+    fetch(`/chat/group`, {
+      headers: { Authorization: `bearer ${localStorage.getItem('token')}` }
+    })
+      .then(res => res.json())
+  );
+
+  promises.push(
+    fetch(`/chat/conversation`, {
+      headers: { Authorization: `bearer ${localStorage.getItem('token')}` }
+    })
+      .then(res => res.json())
+  );
+
+  const [groupMessages, conversationMessages] = await Promise.all(promises);
+
+  return [...groupMessages, ...conversationMessages];
 }

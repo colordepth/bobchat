@@ -42,13 +42,25 @@ io.on("connection", async socket => {
     const targetRoom = (messageBelongsToGroup ? 'group ' : 'conversation ') + data.to;
 
     console.log("message received", data, targetRoom);
-
-    io.to(targetRoom).emit("chat message", {...data, ...message, sender: socket.userID});
     
     if (messageBelongsToGroup)
       impureQueries.addMessageToGroup(message, data.to, socket.userID);
     else 
       impureQueries.addMessageToConversation(message, data.to, socket.userID);
+    
+    const socketPayload = {
+      ...message,
+      creator_id: socket.userID,
+      seen_time: null,
+      delivered_time: null,
+    };
+
+    if (messageBelongsToGroup)
+      socketPayload.group_id = data.to;
+    else
+      socketPayload.conversation_id = data.to;
+
+    io.to(targetRoom).emit("chat message", socketPayload);
   })
 })
 

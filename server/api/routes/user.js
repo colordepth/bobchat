@@ -17,10 +17,7 @@ userRoute.get('/', async (req, res) => {
 
   if (!user) return res.status(401).end();
 
-  const contacts = commonQuery.getUserContacts(user.phone);
-  console.log('received GET', contacts);
-
-  res.json({...user, contacts});
+  res.json(user);
 })
 
 userRoute.get('/:userID', async (req, res) => {
