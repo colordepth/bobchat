@@ -258,6 +258,7 @@ INNER JOIN(
 function getAllConversationMessages(userID) {
   return queryExec(`
   SELECT   
+	creator_id,
 	conversation_id,
     seen_time,
     delivered_time,
@@ -266,22 +267,36 @@ function getAllConversationMessages(userID) {
     text 
 FROM  
 	message_belongs_to_conversation
-INNER JOIN(  
-			SELECT *  
-			FROM    
-				user_receives_message  
-			INNER JOIN   
-				message  
-			ON    
-				user_receives_message.message_partial_id=message.partial_id
-				AND user_phone=${userID}) 
-		AS user_message_rel 
-		ON  
-			user_message_rel.message_partial_id=message_belongs_to_conversation.message_partial_id
+INNER JOIN( 
+			SELECT 
+				user_message_rel.*,
+                user_creates_message.user_phone AS creator_id
+            FROM
+				user_creates_message
+			INNER JOIN(
+				SELECT  
+					delivered_time,
+                    seen_time,
+                    user_receives_message.message_partial_id,
+                    text,
+                    attachment,
+                    creation_time
+				FROM    
+					user_receives_message  
+				INNER JOIN   
+					message  
+				ON    
+				user_receives_message.message_partial_id=message.partial_id     
+				AND user_phone=${userID}) AS user_message_rel
+                ON
+					user_message_rel.message_partial_id=user_creates_message.message_partial_id
+                )
+		AS user_create_message_rel 
+		ON  user_create_message_rel.message_partial_id=message_belongs_to_conversation.message_partial_id
   `);
 }
 
-var lastPartialID;
+var lastPartialID, lastConversationID, lastGroupID;
 
 queryExec(`
     SELECT MAX(partial_id)
@@ -290,6 +305,22 @@ queryExec(`
   .then(results => results.map(result => result['MAX(partial_id)']))
   .then(results => results.length===0 ? 0 : results[0])
   .then(id => {lastPartialID = id})
+
+queryExec(`
+    SELECT MAX(id)
+    FROM conversation
+  `)
+  .then(results => results.map(result => result['MAX(id)']))
+  .then(results => results.length===0 ? 0 : results[0])
+  .then(id => {lastConversationID = id})
+
+queryExec(`
+    SELECT MAX(id)
+    FROM conversation
+  `)
+  .then(results => results.map(result => result['MAX(id)']))
+  .then(results => results.length===0 ? 0 : results[0])
+  .then(id => {lastGroupID = id})
 
 async function addMessageToGroup(message, groupID, creatorID) {
   console.log("Last partial id", lastPartialID);
@@ -348,6 +379,28 @@ function addContact(userID, contactID) {
   `);
 }
 
+async function addConversation(userID, contactID) {
+  queryExec(`
+    INSERT INTO bobchat_production.conversation VALUES();
+  `);
+
+  lastConversationID += 1
+
+  queryExec(`
+    INSERT INTO user_in_conversation (user_phone, conversation_id)
+    VALUES
+      (${userID}, ${lastConversationID})
+  `);
+
+  queryExec(`
+    INSERT INTO user_in_conversation (user_phone, conversation_id)
+    VALUES
+      (${contactID}, ${lastConversationID})
+  `);
+
+  return lastConversationID;;
+}
+
 module.exports = {
   queryExec,
   commonQuery: {
@@ -355,7 +408,7 @@ module.exports = {
     getUserIDsInGroup, getMessagesPartialIDsInConversation,
     getMessagesPartialIDsInGroup, getMessageReports, getCreatorOfMessage, getUserContacts,
     getUserConversationsIDs, getUserGroupsIDs, getAllGroupMessages, getAllConversationMessages,
-    addContact
+    addContact, addConversation
   },
   // TODO: Modify impure queries to get result in a single query
   impureQueries: {

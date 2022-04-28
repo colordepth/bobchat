@@ -1,7 +1,8 @@
 import { useSelector } from "react-redux";
-import { selectActiveConversationID, selectConversationByPartnerID } from "../slices/conversationSlice";
+import { selectActiveConversationID, selectAllContacts, selectConversationByPartnerID } from "../slices/conversationSlice";
 import ChatInput from "./ChatInput";
 import "../stylesheets/ConversationView.css";
+import { useEffect, useRef } from "react";
 
 const ConversationHeader = ({ conversation }) => {
   return (
@@ -11,10 +12,43 @@ const ConversationHeader = ({ conversation }) => {
   );
 }
 
-const ConversationContent = ({ conversation }) => {
+const MessageCloud = ({ message }) => {
+  const date = new Date(message.creation_time);
+  const contacts = useSelector(selectAllContacts);
+  const contact = contacts && contacts.find(contact => contact.phone == message.sender);
+
+  console.log("wtf", contact)
+
   return (
-    <div className="ConversationContent">
-      { conversation.messages && conversation.messages.map(message => <li key={message.partial_id}>{message.text}</li>) }
+    <div className="MessageCloud">
+      <div>
+        {contact ? contact.name : message.sender}Deepam Sarmah
+      </div>
+      <div>
+        {message.content || message.text}
+      </div>
+      <div>
+        { date.toDateString() + ' | ' + date.toLocaleTimeString() }
+      </div>
+    </div>
+  );
+}
+
+const ConversationContent = ({ conversation }) => {
+  const conversationContentRef = useRef();
+
+  useEffect(() => {
+    conversationContentRef
+    && conversationContentRef.current
+    && conversationContentRef.current.scrollTo(0, 9999999999);
+  })
+
+  return (
+    <div className="ConversationContent" ref={conversationContentRef}>
+      { conversation.messages && conversation.messages.map(message => {
+          return <MessageCloud message={message} key={JSON.stringify(message)}/>;
+        })
+      }
     </div>
   );
 }

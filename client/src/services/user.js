@@ -28,7 +28,7 @@ export function postContact(contactNumber) {
         'Authorization': `bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(contactNumber)
+      body: JSON.stringify({contact: contactNumber})
     })
     .then(res => res.json());
 }
@@ -40,7 +40,7 @@ export function postConversation(contactNumber) {
         'Authorization': `bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(contactNumber)
+      body: JSON.stringify({contact: contactNumber})
     })
     .then(res => res.json());
 }

@@ -7,7 +7,8 @@ const conversationSlice = createSlice({
   initialState: {
     conversations: null,
     activeConversationID: null,
-    contacts: null
+    contacts: null,
+    selfInfo: null
   },
   reducers: {
     addMessageToConversations: (state, action) => {
@@ -16,7 +17,7 @@ const conversationSlice = createSlice({
 
       const targetConversation = state.conversations.find(conversation =>
         conversation.partnerID === chatID ||
-        conversation.partnerID === chatID
+        conversation.partnerID === message.to
       );
 
       if (!targetConversation.messages) targetConversation.messages = [];
@@ -31,17 +32,22 @@ const conversationSlice = createSlice({
       const conversations = action.payload;
       state.conversations = conversations;
     },
-    addContacts: (state, action) => {
-      if (state.contacts === null) {
+    addContact: (state, action) => {
+      if (!state.contacts) {
         state.contacts = [];
       }
 
-      state.contacts.push(...action.payload);
+      if (state.contacts.find(contact => contact.phone === action.payload.phone)) return;
+
+      state.contacts.push(action.payload);
+    },
+    setSelfInfo: (state, action) => {
+      state.selfInfo = action.payload;
     }
   }
 })
 
-export const { addMessageToConversations, setActiveConversationID, setConversations, addContacts } = conversationSlice.actions;
+export const { addMessageToConversations, setActiveConversationID, setConversations, addContact } = conversationSlice.actions;
 
 export const selectAllConversations = state => state.conversation.conversations;
 export const selectActiveConversationID = state => state.conversation.activeConversationID;

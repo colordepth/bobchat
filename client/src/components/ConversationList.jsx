@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { selectAllConversations } from "../slices/conversationSlice";
-import { postContact } from "../services/user";
+import { addContact, selectAllContacts, selectAllConversations, setConversations } from "../slices/conversationSlice";
+import { postContact, postConversation } from "../services/user";
+import socket from "../services/socket";
 import ConversationItem from "./ConversationItem";
 import Modal from "./Modal";
 
 import "../stylesheets/ConversationList.css";
-
 
 const FetchingState = () => {
   return (
@@ -25,7 +25,38 @@ const EmptyConversationsList = () => {
   );
 }
 
-const MessageNewEntity = () => {
+const AddNewConversation = () => {
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const contacts = useSelector(selectAllContacts);
+  const conversations = useSelector(selectAllConversations);
+  const dispatch = useDispatch();
+
+  function onClickAddConversation(contact) {
+    setModalIsOpen(false);
+    postConversation(contact)
+      .then(result => {
+        console.log("add conversation", result);
+        dispatch(setConversations([...conversations, result]));
+        socket.once("disconnect", () => {
+          socket.connect();
+        });
+        socket.disconnect();
+      })
+  }
+
+  return (
+    <>
+      <Modal isOpen={modalIsOpen}>
+        <div style={{display: 'flex', flexDirection: 'column'}}>
+          {contacts && contacts.map(contact => <button key={contact.phone} onClick={() => onClickAddConversation(contact.phone)}>{contact.phone + ' | ' + contact.name}</button>)}
+        </div>
+      </Modal>
+      <button disabled={!conversations} onClick={() => setModalIsOpen(true)}>Add Conversation</button>
+    </>
+  );
+}
+
+const AddNewContact = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [contactNumber, setContactNumber] = useState('');
   const dispatch = useDispatch();
@@ -35,24 +66,12 @@ const MessageNewEntity = () => {
     postContact(contactNumber)
       .then(res => {
         console.log("add contact", res);
+        dispatch(addContact(res));
       })
       .catch(err => {
+        console.log("Ah", err);
         alert("User doesn't exist!");
       })
-  }
-
-  function addChat() {
-    var choice = prompt("Choose type of chat (group/conversation)");
-
-    if (choice.toLocaleLowerCase() === 'group') {
-      const groupName = prompt("Enter group name");
-    }
-    else if (choice.toLocaleLowerCase() === 'conversation') {
-      
-    }
-    else {
-      alert("Invalid choice!");
-    }
   }
 
   return (
@@ -64,7 +83,6 @@ const MessageNewEntity = () => {
         </div>
       </Modal>
       <button onClick={() => setModalIsOpen(true)}>Add Contact</button>
-      <button onClick={addChat}>Add Conversation/Group</button>
     </>
   );
 }
@@ -81,8 +99,9 @@ const ConversationList = () => {
 
   return (
     <div className="ConversationList">
+      <AddNewContact />
+      <AddNewConversation />
       { ConversationItemsList }
-      <MessageNewEntity />
     </div>
   );
 }

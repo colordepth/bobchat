@@ -7,7 +7,7 @@ import ConversationList from "../components/ConversationList";
 import { getUserChats } from "../services/user";
 import { getMessagesFromChat } from "../services/chat";
 import { upgradeConnectionToSocket } from "../services/auth";
-import { setConversations, addMessageToConversations, setActiveConversationID } from "../slices/conversationSlice";
+import { setConversations, addMessageToConversations, setActiveConversationID, addContact } from "../slices/conversationSlice";
 
 import "../stylesheets/App.css";
 
@@ -24,6 +24,7 @@ const App = () => {
       const data = await getUserChats();
       const chats = [...data.conversations, ...data.groups];
       dispatch(setConversations(chats));
+      data.contacts.forEach(contact => dispatch(addContact(contact)));
 
       console.log(data);
       console.log("Fetching messages");

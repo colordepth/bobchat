@@ -9,6 +9,7 @@ socket.onAny((event, ...args) => {
 });
 
 socket.on('chat message', data => {
+  console.log("WTF5", data);
   store.dispatch(addMessageToConversations({message: data, chatID: data.isGroup ? data.to : data.toPerson}));
 }) 
 
