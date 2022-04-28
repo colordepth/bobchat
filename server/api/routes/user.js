@@ -9,7 +9,8 @@ userRoute.post('/', async (req, res) => {
 
   if (!user) return res.status(401).end();
 
-  console.log('received POST', userID);
+  console.log('received POST', req.body);
+  // commonQuery.updateUser(req.body.name);
 })
 
 userRoute.get('/', async (req, res) => {

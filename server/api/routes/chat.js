@@ -66,6 +66,20 @@ chatRoute.get('/group', async (req, res) => {
   res.json(messages);
 });
 
+chatRoute.get('/attachment/:partialID', async (req, res) => {
+  const user = await getUserFromRequest(req);
+
+  if (!user) return res.status(401).end();
+
+  const { partialID } = req.params;
+
+  if (!partialID) return res.status(400).end();
+
+  const message = await commonQuery.getMessageByPartialID(partialID);
+
+  res.json({ filename: message.text, attachment: message.attachment });
+});
+
 chatRoute.get('/conversation', async (req, res) => {
   const user = await getUserFromRequest(req);
 

@@ -4,7 +4,6 @@ import "../stylesheets/ChatInput.css";
 
 const ChatInput = ({ conversation }) => {
   const [inputText, setInputText] = useState("");
-  const [attachment, setAttachment] = useState(null);
 
   function selectFile() {
     const input = document.createElement('input');
@@ -17,21 +16,21 @@ const ChatInput = ({ conversation }) => {
 
       reader.onload = readerEvent => {
         console.log(readerEvent.target.result);
-        setAttachment({
+        sendMessage(conversation, file.name, {
           name: file.name,
           size: file.size,
           type: file.type,
           content: readerEvent.target.result
-        })
+        });
       }
     }
     input.click();
   }
 
   function submitChatInput(event) {
-    event.preventDefault();
+    event && event.preventDefault();
     if (inputText.length)
-      sendMessage(conversation, inputText, attachment);
+      sendMessage(conversation, inputText, null);
     setInputText("");
   }
 

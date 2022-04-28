@@ -29,17 +29,38 @@ const MessageCloud = ({ message }) => {
   const self = useSelector(selectSelfInfo);
   const user = contacts && contacts.concat(self || {}).find(user => user.phone == message.creator_id);
 
+  function downloadAttachment() {
+    fetch(`/chat/attachment/${message.partial_id}`, {
+      headers: { Authorization: `bearer ${localStorage.getItem('token')}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        const fileBlob = new Blob(data.attachment.data);
+        const fileName = data.filename;
+
+        var url = window.URL.createObjectURL(fileBlob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
+        a.click();    
+        a.remove();
+      })
+  }
+
   return (
     <span className="MessageCloud"
       title={message.creator_id}
       style={self && user && self.phone == user.phone ? {
         alignSelf: 'flex-end',
+        cursor: 'pointer'
       } : {}}
     >
       <span
         style={self && user && self.phone == user.phone ? {color: '#0a9337'} : {}}
+        onClick={downloadAttachment}
       >
-        { user ? user.name : (message.creator_id) }
+        { (user ? user.name : message.creator_id) + (message.attachment ? ' 📎' : '') }
       </span>
       <span style={self && user && self.phone == user.phone ? {paddingRight: '4rem'} : {}}>
         { message.text }
