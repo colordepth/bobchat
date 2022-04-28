@@ -8,7 +8,7 @@ loginRoute.post('/', async (req, res) => {
   const { userID } = req.body;
 
   if (!userID) {
-    return res.status(400).json({ error: "Missing userID" })
+    return res.status(400).json({ message: "Missing userID" })
   }
 
   const user = await commonQuery.getUserByID(userID);

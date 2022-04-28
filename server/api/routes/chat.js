@@ -56,7 +56,12 @@ chatRoute.get('/group', async (req, res) => {
 
   if (!user) return res.status(401).end();
 
-  const messages = await commonQuery.getAllGroupMessages(user.phone);
+  const messages = (await commonQuery.getAllGroupMessages(user.phone)).map(message => {
+    return {
+      ...message,
+      attachment: !!message.attachment
+    }
+  });
 
   res.json(messages);
 });
@@ -66,7 +71,12 @@ chatRoute.get('/conversation', async (req, res) => {
 
   if (!user) return res.status(401).end();
 
-  const messages = await commonQuery.getAllConversationMessages(user.phone);
+  const messages = (await commonQuery.getAllConversationMessages(user.phone)).map(message => {
+    return {
+      ...message,
+      attachment: !!message.attachment
+    }
+  });
 
   res.json(messages);
 });

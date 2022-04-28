@@ -34,7 +34,7 @@ io.on("connection", async socket => {
   socket.on("chat message", data => {
     const message = {
       text: data.content,
-      attachment: data.attachment,
+      attachment: data.attachment && Buffer.from(data.attachment.content),
       creation_time: new Date()
     };
 
@@ -42,7 +42,7 @@ io.on("connection", async socket => {
     const targetRoom = (messageBelongsToGroup ? 'group ' : 'conversation ') + data.to;
 
     console.log("message received", data, targetRoom);
-    
+
     if (messageBelongsToGroup)
       impureQueries.addMessageToGroup(message, data.to, socket.userID);
     else 
@@ -53,6 +53,7 @@ io.on("connection", async socket => {
       creator_id: socket.userID,
       seen_time: null,
       delivered_time: null,
+      attachment: !!message.attachment
     };
 
     if (messageBelongsToGroup)

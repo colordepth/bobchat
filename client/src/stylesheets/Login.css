@@ -1,7 +1,7 @@
 .LoginCard {
   background: #255544;
   width: 400px;
-  height: 150px;
+  /* height: 150px; */
   border-radius: 10px;
   box-shadow: #333 0 0 2px 1px;
   margin: 0.4rem;
@@ -11,4 +11,5 @@
   align-items: center;
   justify-content: space-around;
   padding: 30px;
+  gap: 1rem;
 }

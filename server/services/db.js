@@ -316,7 +316,7 @@ queryExec(`
 
 queryExec(`
     SELECT MAX(id)
-    FROM conversation
+    FROM bobchat_production.group
   `)
   .then(results => results.map(result => result['MAX(id)']))
   .then(results => results.length===0 ? 0 : results[0])
@@ -326,14 +326,13 @@ async function addMessageToGroup(message, groupID, creatorID) {
   console.log("Last partial id", lastPartialID);
   lastPartialID += 1;
 
-  queryExec(`
-    INSERT INTO message (partial_id, text, attachment, creation_time)
-    VALUES
-      (
-        ${lastPartialID + 1}, '${message.text}', ${message.attachment},
-        '${message.creation_time.toISOString().replace('T', ' ').slice(0, -5)}'
-      )
-  `);
+  db.query("INSERT INTO `message` SET ?", {
+    partial_id: lastPartialID,
+    text: message.text,
+    creation_time: message.creation_time,
+    attachment: Buffer.from(message.attachment)
+  });
+
   queryExec(`
     INSERT INTO message_belongs_to_group (message_partial_id, group_id)
     VALUES
@@ -351,14 +350,13 @@ async function addMessageToConversation(message, conversationID, creatorID) {
 
   lastPartialID += 1;
 
-  queryExec(`
-    INSERT INTO message (partial_id, text, attachment, creation_time)
-    VALUES
-      (
-        ${lastPartialID + 1}, '${message.text}', ${message.attachment},
-        '${message.creation_time.toISOString().replace('T', ' ').slice(0, -5)}'
-      )
-  `);
+  db.query("INSERT INTO `message` SET ?", {
+    partial_id: lastPartialID,
+    text: message.text,
+    creation_time: message.creation_time,
+    attachment: Buffer.from(message.attachment)
+  });
+
   queryExec(`
     INSERT INTO message_belongs_to_conversation (message_partial_id, conversation_id)
     VALUES
@@ -401,6 +399,43 @@ async function addConversation(userID, contactID) {
   return lastConversationID;;
 }
 
+async function addGroup(name, description, members, owner) {
+  queryExec(`
+    INSERT INTO bobchat_production.group (name, description) VALUES('${name}', '${description}');
+  `);
+
+  lastGroupID += 1
+
+  members.forEach(memberID => {
+    queryExec(`
+      INSERT INTO user_in_group (user_phone, group_id)
+      VALUES
+        (${memberID}, ${lastGroupID})
+    `);
+  })
+
+  queryExec(`
+    INSERT INTO user_in_group (user_phone, group_id)
+    VALUES
+      (${owner}, ${lastGroupID})
+  `)
+
+  return lastGroupID;
+}
+
+function addUser(phone, name, about) {
+  return queryExec(`
+    INSERT INTO user (phone, name, about, last_seen_on_setting, about_visibility_setting, read_receipt_setting)
+    VALUES (${phone}, '${name}', '${about}', "1", "1", "1")
+  `);
+}
+
+function getUsersByIDs(userIDs) {
+  return queryExec(`
+    SELECT * FROM bobchat_production.user WHERE phone in (${userIDs.join(',')});
+  `);
+}
+
 module.exports = {
   queryExec,
   commonQuery: {
@@ -408,7 +443,7 @@ module.exports = {
     getUserIDsInGroup, getMessagesPartialIDsInConversation,
     getMessagesPartialIDsInGroup, getMessageReports, getCreatorOfMessage, getUserContacts,
     getUserConversationsIDs, getUserGroupsIDs, getAllGroupMessages, getAllConversationMessages,
-    addContact, addConversation
+    addContact, addConversation, addGroup, getUsersByIDs, addUser
   },
   // TODO: Modify impure queries to get result in a single query
   impureQueries: {

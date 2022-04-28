@@ -40,6 +40,18 @@ export function postContact(contactNumber) {
     .then(res => res.json());
 }
 
+export function postGroup(name, description, members) {
+  return fetch('/user/group', {
+      method: 'POST',
+      headers: {
+        'Authorization': `bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({name, description, members})
+    })
+    .then(res => res.json());
+}
+
 export function postConversation(contactNumber) {
   return fetch('/user/conversation', {
       method: 'POST',

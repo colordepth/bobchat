@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { addContact, selectAllContacts, selectAllConversations, setConversations } from "../slices/conversationSlice";
-import { postContact, postConversation } from "../services/user";
+import { addContact, selectAllContacts, selectAllConversations, selectSelfInfo, setConversations } from "../slices/conversationSlice";
+import { postContact, postConversation, postGroup } from "../services/user";
 import socket from "../services/socket";
 import ConversationItem from "./ConversationItem";
 import Modal from "./Modal";
@@ -19,8 +19,10 @@ const FetchingState = () => {
 
 const EmptyConversationsList = () => {
   return (
-    <div className="ConversationList unready-state">
-      No conversations yet.
+    <div className="ConversationList">
+      <AddNewContact />
+      <AddNewConversation />
+      <div className='unready-state' style={{flexGrow: '1'}}>No conversations yet.</div>
     </div>
   );
 }
@@ -46,7 +48,7 @@ const AddNewConversation = () => {
 
   return (
     <>
-      <Modal isOpen={modalIsOpen}>
+      <Modal isOpen={contacts && contacts.length && modalIsOpen}>
         <div style={{display: 'flex', flexDirection: 'column'}}>
           {contacts && contacts.map(contact => <button key={contact.phone} onClick={() => onClickAddConversation(contact.phone)}>{contact.phone + ' | ' + contact.name}</button>)}
         </div>
@@ -86,6 +88,78 @@ const AddNewContact = () => {
   );
 }
 
+const AddNewGroup = () => {
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [members, setMember] = useState([]);
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const selfInfo = useSelector(selectSelfInfo);
+  const contacts = useSelector(selectAllContacts);
+  const conversations = useSelector(selectAllConversations);
+  const dispatch = useDispatch();
+
+  function onClickAddGroup() {
+    if (!(name.length && description.length)) return alert('Please enter group name and description');
+
+    setModalIsOpen(false);
+    postGroup(name, description, members.map(member => member.phone))
+      .then(result => {
+        console.log("add group", result);
+        dispatch(setConversations([...conversations, result]));
+        socket.once("disconnect", () => {
+          socket.connect();
+        });
+        socket.disconnect();
+      })
+  }
+
+  return (
+    <>
+      <Modal isOpen={modalIsOpen}>
+        <div style={{display: 'flex', flexDirection: 'column', background: '#255544', padding: '2rem', borderRadius: '13px', gap: '1rem', color: '#ddeeee'}}>
+          <div style={{display: 'flex', flexDirection: 'column', gap: '0.1rem'}}>
+            <label>
+                <input
+                  type='checkbox'
+                  defaultChecked={true}
+                  disabled
+                />
+                You
+              </label>
+          {
+          contacts && 
+          contacts
+            .filter(contact => selfInfo ? contact.phone !== selfInfo.phone : true)
+            .map(contact => {
+              const isChecked = members.find(existing => existing.phone === contact.phone);
+              function toggleChecked() {
+                isChecked ?
+                  setMember(members.filter(existing => existing.phone !== contact.phone)) :
+                  setMember(members.concat(contact))
+              }
+              return <label key={contact.phone} style={{}}>
+                <input
+                  type='checkbox'
+                  defaultChecked={isChecked}
+                  onChange={toggleChecked}
+                />
+                {contact.phone + ' | ' + contact.name}
+              </label>
+            }
+          )}
+          </div>
+          <span>Group Name:</span>
+          <input type="text" value={name} onChange={event => setName(event.target.value)}></input>
+          <span>Group Description:</span>
+          <input type="text" value={description} onChange={event => setDescription(event.target.value)}></input>
+          <button onClick={onClickAddGroup}>Create Group</button>
+        </div>
+      </Modal>
+      <button disabled={!conversations} onClick={() => setModalIsOpen(true)}>Add New Group</button>
+    </>
+  );
+}
+
 const ConversationList = () => {
   const conversations = useSelector(selectAllConversations);
 
@@ -100,6 +174,7 @@ const ConversationList = () => {
     <div className="ConversationList">
       <AddNewContact />
       <AddNewConversation />
+      <AddNewGroup />
       { ConversationItemsList }
     </div>
   );

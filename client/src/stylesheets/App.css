@@ -17,8 +17,14 @@ button, input[type="submit"] {
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 14px;
+  border-radius: 7px;
   background-color: #01b393;
   color: rgb(240, 247, 232);
   font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 0.2rem;
+}
+
+button:hover, input[type="submit"]:hover {
+  background-color: #00a788;
 }

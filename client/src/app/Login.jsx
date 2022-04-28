@@ -1,16 +1,19 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "../components/Modal";
-import { postLogin } from "../services/auth";
+import { postLogin, postRegister } from "../services/auth";
 import "../stylesheets/Login.css";
 
 const Login = () => {
   const navigate = useNavigate();
+  const [userID, setUserID] = useState('');
+  const [name, setName] = useState('');
+  const [about, setAbout] = useState('');
 
-  function loginSubmit(event) {
-    event.preventDefault();
+  function loginSubmit() {
+    if (!(userID && !isNaN(userID))) return alert("Please enter a phone number");
 
-    postLogin(event.target.userID.value)
+    postLogin(userID)
       .then(data => {
         localStorage.setItem('userID', data.userID);
         localStorage.setItem('token', data.token);
@@ -21,18 +24,51 @@ const Login = () => {
       })
   }
 
+  function registerSubmit() {
+    if (!(userID && !isNaN(userID) && name.length && about.length)) return alert("Please enter all details");
+    
+    postRegister(userID, name, about)
+      .then(data => {
+        alert("User registered successfully!");
+        localStorage.setItem('userID', data.userID);
+        localStorage.setItem('token', data.token);
+        navigate('/');
+      })
+      .catch(error => {
+        alert(error.message);
+      })
+  }
+
   return (
     <Modal isOpen={true}>
-      <form className="LoginCard" onSubmit={loginSubmit}>
+      <form className="LoginCard" onSubmit={event => event.preventDefault()}>
+        <input
+          type="phone"
+          value={userID}
+          placeholder="Phone number"
+          onChange={event => setUserID(event.target.value)}
+        />
+        <button onClick={loginSubmit}>Log in</button>
+        <div></div>
+        <input
+          type="phone"
+          value={userID}
+          placeholder="Phone number"
+          onChange={event => setUserID(event.target.value)}
+        />
         <input
           type="text"
-          name="userID"
-          // value={userID}
-          placeholder="Phone number"
-          // onChange={event => setUserID(event.target.value)}
+          value={name}
+          placeholder="Name"
+          onChange={event => setName(event.target.value)}
         />
-
-        <input type="submit" value="Log in" />
+        <textarea
+          type=""
+          value={about}
+          placeholder="About"
+          onChange={event => setAbout(event.target.value)}
+        />
+        <button onClick={registerSubmit}>Sign Up</button>
       </form>
     </Modal>
   );

@@ -46,6 +46,8 @@
   background-color: #026855;
   height: 4rem;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: space-around;
+  padding: 1rem;
 }

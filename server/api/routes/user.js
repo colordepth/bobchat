@@ -1,6 +1,6 @@
 const express = require('express');
 const { getUserFromRequest } = require('../../services/auth');
-const { commonQuery } = require('../../services/db');
+const { commonQuery, impureQueries } = require('../../services/db');
 
 const userRoute = express.Router();
 
@@ -57,10 +57,37 @@ userRoute.post('/conversation', async (req, res) => {
   commonQuery
     .addConversation(user.phone, contact.phone)
     .then(conversationID => {
-      res.json({...contact, id: conversationID, partnerID: contact.phone})
+      res.json({...contact, id: conversationID, partnerID: contact.phone, isGroup: false})
     })
     .catch(error => {
-      // Entry already exists prolly.
+      //
+    })
+})
+
+userRoute.post('/group', async (req, res) => {
+  const user = await getUserFromRequest(req);
+
+  if (!user) return res.status(401).end();
+
+  const { name, description, members } = req.body;
+
+  console.log('/group', name, description, members);
+
+  if (!(name && description && members && members.length))
+    return res.status(400).end();
+
+  commonQuery
+    .addGroup(name, description, members, user.phone)
+    .then(async groupID => {
+      console.log("Returned with", groupID);
+      res.json({
+        name,
+        description,
+        id: groupID,
+        partnerID: groupID,
+        isGroup: true,
+        users: await commonQuery.getUsersByIDs(members)
+      })
     })
 })
 

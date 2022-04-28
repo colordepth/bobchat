@@ -5,9 +5,20 @@ import "../stylesheets/ConversationView.css";
 import { useEffect, useRef } from "react";
 
 const ConversationHeader = ({ conversation }) => {
+  console.log(conversation);
+  const contacts = useSelector(selectAllContacts);
+  const self = useSelector(selectSelfInfo);
+
   return (
     <div className="ConversationHeader">
-      { conversation.name }
+      <div>{ conversation.name } <br/></div>
+      <div>
+      {
+        conversation.isGroup && conversation.users.map(user => {
+          return <span title={user.phone}>{' ' + user.name.split(' ').at(0) + ', '}</span>
+        })
+      }
+      </div>
     </div>
   );
 }
